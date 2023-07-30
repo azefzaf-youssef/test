@@ -97,3 +97,48 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+
+
+
+
+
+
+
+
+
+const { google } = require('googleapis');
+
+// Set up OAuth2 client with your credentials
+const oauth2Client = new google.auth.OAuth2(
+  'YOUR_CLIENT_ID',
+  'YOUR_CLIENT_SECRET',
+  'YOUR_REDIRECT_URI'
+);
+
+// Set the access token obtained after the OAuth2 flow
+oauth2Client.setCredentials({
+  access_token: 'USER_ACCESS_TOKEN',
+  refresh_token: 'USER_REFRESH_TOKEN',
+});
+
+// Create a Gmail API client
+const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+
+// Function to send an email
+async function sendEmail(to, subject, message) {
+  const rawMessage = `From: YOUR_EMAIL_ADDRESS\r\nTo: ${to}\r\nSubject: ${subject}\r\n\r\n${message}`;
+
+  try {
+    await gmail.users.messages.send({
+      userId: 'me',
+      requestBody: {
+        raw: Buffer.from(rawMessage).toString('base64'),
+      },
+    });
+
+    console.log('Email sent successfully');
+  } catch (error) {
+    console.error('Error sending email:', error);
+  }
+}
